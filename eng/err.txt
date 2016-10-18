@@ -1,0 +1,13 @@
+Exception in thread "main" java.io.IOException: Cannot run program "../warlight2-cpe480/bin/bot/BotStarter.class": error=2, No such file or directory
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1047)
+	at java.lang.Runtime.exec(Runtime.java:617)
+	at java.lang.Runtime.exec(Runtime.java:450)
+	at java.lang.Runtime.exec(Runtime.java:347)
+	at com.theaigames.engine.Engine.addPlayer(Engine.java:67)
+	at com.theaigames.game.warlight2.Warlight2.main(Warlight2.java:289)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.lang.UNIXProcess.forkAndExec(Native Method)
+	at java.lang.UNIXProcess.<init>(UNIXProcess.java:187)
+	at java.lang.ProcessImpl.start(ProcessImpl.java:130)
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1028)
+	... 5 more
