@@ -14,7 +14,7 @@ package bot;
  * This is a simple bot that does random (but correct) moves.
  * This class implements the Bot interface and overrides its Move methods.
  * You can implement these methods yourself very easily now,
- * since you can retrieve all information about the match from variable “state”.
+ * since you can retrieve all information about the match from variable state
  * When the bot decided on the move to make, it returns an ArrayList of Moves. 
  * The bot is started by creating a Parser to which you add
  * a new instance of your bot, and then the parser is started.
