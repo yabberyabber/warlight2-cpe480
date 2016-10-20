@@ -1,4 +1,5 @@
 botjar: botc
+	mkdir -p bin
 	cd bin && jar cvfm ../AdvancedBot.jar ../manifest */*.class
 	chmod +x AdvancedBot.jar
 
