@@ -1,4 +1,5 @@
 botjar: botc
+	mkdir -p bin
 	cd bin && jar cvfm ../RandomBot.jar ../manifest */*.class
 	chmod +x RandomBot.jar
 
