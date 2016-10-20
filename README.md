@@ -11,6 +11,6 @@ This will pit the RandomBot against the RandomBot.  To stage a fight between two
 
 Will fight AdvancedBot against RandomBot
 
-`make fight BOT=AdvancedBot`BOT2=AdvancedBot
+`make fight BOT=AdvancedBot BOT2=AdvancedBot`
 
 Will fight AdvancedBot against AdvancedBot
