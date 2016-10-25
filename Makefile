@@ -14,10 +14,13 @@ zip:
 	rm notPhaseBot.zip
 	cd RandomBot/src && zip -r notPhaseBot.zip * && mv notPhaseBot.zip ../..
 
-engine: engine/bin
+engine: engine/bin/com/theaigames/engine/Engine.class
+
+engine/bin/com/theaigames/engine/Engine.class:
+	mkdir -p engine/bin
 	cd engine && javac -sourcepath src/ -d bin/ -cp lib/java-json.jar `find src/ -name '*.java' -regex '^[./A-Za-z0-9]*$$'`
 
-engine/bin:
-	mkdir engine/bin
+clean: FORCE
+	rm -r */bin
 
 FORCE:
