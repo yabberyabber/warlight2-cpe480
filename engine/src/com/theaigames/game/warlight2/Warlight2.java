@@ -36,6 +36,8 @@ import com.theaigames.game.warlight2.move.MoveResult;
 import com.theaigames.game.warlight2.move.PlaceArmiesMove;
 import com.theaigames.game.warlight2.map.Map;
 
+import com.theaigames.tsteinke.Logger;
+
 /**
  * Warlight2 class
  * 
@@ -55,16 +57,22 @@ public class Warlight2 implements Logic
 
 	private String secretKey, accessKey;
 	
+	private Logger mapDataLogger;
+	private Logger dataLogger;
+
 	private final int STARTING_ARMIES = 5;
 	private final long TIMEBANK_MAX = 10000l;
 	private final long TIME_PER_MOVE = 500l;
 	private final int SIZE_WASTELANDS = 6; // size of wastelands, <= 0 for no wastelands
 
-	public Warlight2(String mapFile)
+	public Warlight2(String mapFile, Logger dataLogger, Logger mapDataLogger)
 	{
 		this.mapFile = mapFile;
 		this.playerName1 = "player1";
 		this.playerName2 = "player2";
+
+		this.mapDataLogger = mapDataLogger;
+		this.dataLogger = dataLogger;
 	}
 	
 	
@@ -91,6 +99,8 @@ public class Warlight2 implements Logic
   		initMap = MapCreator.createMap(getMapString());
   		map = MapCreator.setupMap(initMap, SIZE_WASTELANDS);
   		this.maxRounds = MapCreator.determineMaxRounds(map);
+
+  		mapDataLogger.write(getMapString());
   		
   		// start the processor
   		System.out.println("Starting game...");
@@ -193,7 +203,7 @@ public class Warlight2 implements Logic
 		
 		System.out.println("Done.");
 		
-        System.exit(0);
+        // System.exit(0);
 	}
 
 	/**
@@ -241,10 +251,12 @@ public class Warlight2 implements Logic
 			}
 		}
 		
-		if(winner != null)
+		if(winner != null) {
 			out.append(winner.getName() + " won\n");
-		else
+		}
+		else {
 			out.append("Nobody won\n");
+		}
 
 		return out.toString();
 	}
@@ -257,6 +269,10 @@ public class Warlight2 implements Logic
 		
 		Player winner = this.processor.getWinner();
 		int score = this.processor.getRoundNr() - 1;
+
+		dataLogger.write(getPlayedGame(winner, ""));
+		dataLogger.write(getPlayedGame(winner, "player1"));
+		dataLogger.write(getPlayedGame(winner, "player2"));
 		
 		if(winner != null) {
 			System.out.println("winner: " + winner.getName());
@@ -278,17 +294,25 @@ public class Warlight2 implements Logic
 		String mapFile = args[0];
 		String bot1Cmd = args[1];
 		String bot2Cmd = args[2];
+		String dataFile = args[3];
+		String mapDataFile = args[4];
+
+		Logger dataLogger = new Logger(dataFile);
+		Logger mapDataLogger = new Logger(mapDataFile);
 
 		// Construct engine
         Engine engine = new Engine();
         
         // Set logic
-        engine.setLogic(new Warlight2(mapFile));
+        engine.setLogic(new Warlight2(mapFile, dataLogger, mapDataLogger));
 		
         // Add players
         engine.addPlayer(bot1Cmd);
         engine.addPlayer(bot2Cmd);
 		
         engine.start();
+
+        dataLogger.finalize();
+        mapDataLogger.finalize();
 	}
 }
