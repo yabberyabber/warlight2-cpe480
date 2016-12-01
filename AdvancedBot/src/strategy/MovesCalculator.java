@@ -2,6 +2,7 @@ package strategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
 
 import map.Region;
 import map.SuperRegion;
@@ -37,14 +38,15 @@ public class MovesCalculator {
 		String myName = HistoryTracker.botState.getMyPlayerName();
 		int armies = 1;
 		List<Region> regionsToDeploy = new ArrayList<>();
-		regionsToDeploy = getGoodDeploymentRegions();
+		regionsToDeploy = getSortedDeploymentRegions();
 		while (HistoryTracker.botState.getStartingArmies() > movesSoFar.getTotalDeployment()) {
-			double rand = Math.random();
-			int r = (int) (rand * regionsToDeploy.size());
-			Region region = regionsToDeploy.get(r);
-			PlaceArmiesMove pam = new PlaceArmiesMove(myName, region, armies);
-			movesSoFar.addPlaceArmiesMove(pam);
-			MovesCommitter.committPlaceArmiesMove(pam);
+            for (Region region : regionsToDeploy) {
+                if (region.deploymentRegionValue > Math.random()) {
+                    PlaceArmiesMove pam = new PlaceArmiesMove(myName, region, 1);
+                    movesSoFar.addPlaceArmiesMove(pam);
+                    MovesCommitter.committPlaceArmiesMove(pam);
+                }
+            }
 		}
 
 		// AttackTransferMoves
@@ -147,28 +149,45 @@ public class MovesCalculator {
 		}
 	}
 
-	private static List<Region> getGoodDeploymentRegions() {
-		List<Region> out = new ArrayList<>();
-		// All regions next to the opponent are good
-		out.addAll(HistoryTracker.botState.getVisibleMap().getOpponentBorderingRegions());
-		int bestNeighboringSuperRegionValue = 0;
-		for (Region region : HistoryTracker.botState.getVisibleMap().getBorderRegions()) {
-			if (region.getSuperRegion().getExpansionValue() > bestNeighboringSuperRegionValue) {
-				bestNeighboringSuperRegionValue = region.getSuperRegion().getExpansionValue();
-			}
-		}
-		for (Region region : HistoryTracker.botState.getVisibleMap().getBorderRegions()) {
-			boolean bordersGoodSuperRegion = false;
-			for (Region neighbor : region.getNonOwnedNeighbors()) {
-				if (neighbor.getSuperRegion().getExpansionValue() == bestNeighboringSuperRegionValue) {
-					bordersGoodSuperRegion = true;
-				}
-			}
-			if (bordersGoodSuperRegion && !out.contains(region)) {
-				out.add(region);
-			}
-		}
-		return out;
+	private static List<Region> getSortedDeploymentRegions() {
+        double maxValue = -999;
+        for (Region region : HistoryTracker.botState.getVisibleMap().getOwnedRegions()) {
+            double bordering_armies = region.getSurroundingOpponentArmies();
+            double my_armies = region.getArmies();
+            double others_in_super_region = region.getAmountOfArmiesToOwnSuperRegion();
+
+            region.deploymentRegionValue = 
+                    0.0
+                     + bordering_armies * 1.0
+                     + my_armies * -1.0
+                     + (1.0 / others_in_super_region) * 1.0;
+            if (region.deploymentRegionValue > maxValue) {
+                maxValue = region.deploymentRegionValue;
+            }
+        }
+
+        List<Region> regions = HistoryTracker.botState.getVisibleMap().getOwnedRegions();
+        Collections.sort(regions, new Comparator<Region>() {
+            @Override
+            public int compare(Region me, Region that) {
+                return roundAwayFromZero(me.deploymentRegionValue - that.deploymentRegionValue);
+            }
+        });
+
+        //normalize
+        for (Region region : regions) {
+            region.deploymentRegionValue /= maxValue;
+        }
+
+        return regions;
 	}
 
+    private static int roundAwayFromZero(double in) {
+        if (in > 0) {
+            return (int) Math.ceil(in);
+        }
+        else {
+            return (int) Math.floor(in);
+        }
+    }
 }

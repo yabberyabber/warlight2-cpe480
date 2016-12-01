@@ -23,6 +23,7 @@ public class Region {
 	private int expansionRegionValue;
 	private int attackRegionValue;
 	private int defenceRegionValue;
+    public double deploymentRegionValue;
 	private boolean isRegionBlocked = false;
 
 	public Region(int id, SuperRegion superRegion) {
@@ -239,6 +240,16 @@ public class Region {
 		return out;
 	}
 
+    public int getAmountOfArmiesToOwnSuperRegion() {
+        int out = 0;
+		for (Region neighbor : this.getNeighbors()) {
+			if (neighbor.getSuperRegion().equals(this.getSuperRegion())) {
+                out += neighbor.getArmies();
+			}
+		}
+        return out;
+    }
+
 	// public boolean bordersOwnSuperRegion() {
 	// boolean bordersOwnSuperRegion = false;
 	// for (Region neighbor : this.getNeighbors()) {
@@ -260,6 +271,14 @@ public class Region {
 		}
 		return out;
 	}
+
+    public int getSurroundingOpponentArmies() {
+        int opponentArmies = 0;
+        for (Region neighbor : this.getOpponentNeighbors()) {
+            opponentArmies += neighbor.getIdleArmies();
+        }
+        return opponentArmies;
+    }
 
 	public int getSurroundingIdleArmies() {
 		int idleArmies = 0;
