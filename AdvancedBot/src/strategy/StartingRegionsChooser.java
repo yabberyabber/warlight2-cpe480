@@ -2,6 +2,8 @@ package strategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 import map.Region;
 import map.SuperRegion;
@@ -39,38 +41,32 @@ public class StartingRegionsChooser {
 		return null;
 	}
 
-	private static List<SuperRegionInformation> sortSuperRegions(List<SuperRegionInformation> superRegionInformations) {
-		List<SuperRegionInformation> out = new ArrayList<>();
-		// First choose the SuperRegions with armiesReward > 0 and the least
-		// amount of neutrals
-		List<SuperRegionInformation> superRegionsWithReward = new ArrayList<>();
-		for (SuperRegionInformation sri : superRegionInformations) {
-			if (sri.armiesReward > 0) {
-				superRegionsWithReward.add(sri);
-			}
-		}
-		while (!superRegionsWithReward.isEmpty()) {
-			int minNeutrals = 10000;
-			for (SuperRegionInformation sri : superRegionsWithReward) {
-				if (sri.neutrals < minNeutrals) {
-					minNeutrals = sri.neutrals;
-				}
-			}
-			for (SuperRegionInformation sri : superRegionsWithReward) {
-				if (sri.neutrals == minNeutrals) {
-					out.add(sri);
-				}
-			}
-			superRegionsWithReward.removeAll(out);
-		}
-		// Then add the SuperRegions with armies reward = 0
-		for (SuperRegionInformation sri : superRegionInformations) {
-			if (sri.armiesReward == 0) {
-				out.add(sri);
-			}
-		}
-		return out;
-	}
+   // Sorts the super regions from best region to worst.
+   private static List<SuperRegionInformation> sortSuperRegions(List<SuperRegionInformation> superRegionInformations) {
+      List<SuperRegionInformation> out = new ArrayList<>();
+
+      // The score for a super region is (army bonus)/(number of neutral armies) * 100.
+      // We use this score to decide which super region is the best super region to choose.
+     
+      // Add all the super regions to a list.
+      for (SuperRegionInformation sri : superRegionInformations) {
+         out.add(sri);
+      }
+
+      // Sort the super regions by the score. In the function, we pass a comparator that
+      // we define in the argument. This organizes the super regions by the previously discussed
+      // algorithm.
+      Collections.sort(out, new Comparator<SuperRegionInformation>() {
+         public int compare(SuperRegionInformation sri1, SuperRegionInformation sri2) {
+            int scoreSri1 = (int)(sri1.armiesReward / (float)sri1.neutrals * 100);
+            int scoreSri2 = (int)(sri2.armiesReward / (float)sri2.neutrals * 100); 
+            // List from largest score to smallest
+            return scoreSri2 - scoreSri1;
+         }
+      });
+
+      return out;
+   }
 
 	private static List<SuperRegionInformation> getSuperRegionInformations(BotState state) {
 		List<SuperRegionInformation> out = new ArrayList<>();
@@ -89,10 +85,9 @@ public class StartingRegionsChooser {
 		return out;
 	}
 
-	private static class SuperRegionInformation {
-		int id;
-		int armiesReward;
-		int neutrals;
-	}
-
+   private static class SuperRegionInformation {
+      int id;
+      int armiesReward;
+      int neutrals;
+   }
 }
