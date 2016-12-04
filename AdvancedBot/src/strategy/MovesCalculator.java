@@ -160,7 +160,7 @@ public class MovesCalculator {
                     0.0
                      + bordering_armies * 1.0
                      + my_armies * -1.0
-                     + (1.0 / others_in_super_region) * 1.0;
+                     + (1.0 / others_in_super_region) * 5.0;
             if (region.deploymentRegionValue > maxValue) {
                 maxValue = region.deploymentRegionValue;
             }

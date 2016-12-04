@@ -14,6 +14,9 @@ public class TransferMovesChooser {
 		for (Region region : HistoryTracker.botState.getVisibleMap().getOwnedRegions()) {
 			if (region.getDistanceToBorder() > 1 && region.getIdleArmies() > 0) {
 				List<Region> ownedNeighbors = region.getOwnedNeighbors();
+				if (ownedNeighbors.size() < 1) {
+				   continue;
+				}
 				Region bestNeighbor = ownedNeighbors.get(0);
 				int minDistance = bestNeighbor.getDistanceToBorder();
 				for (Region neighbor : ownedNeighbors) {
